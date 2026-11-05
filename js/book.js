@@ -5,6 +5,7 @@
     s = k  se ve la página k (1 a M)
 */
 (function () {
+  console.info("Invitación libro pop-up · versión 5");
   const C = window.INVITE;
   const P = window.buildPages(C);
   const M = P.leaves.length;
@@ -168,8 +169,10 @@
     if (s === 0 || now < wheelLock) return;
     if (now - wheelAt > 250) wheelAcc = 0;
     wheelAt = now;
-    wheelAcc += e.deltaY;
-    if (Math.abs(wheelAcc) >= 40) {
+    // Normaliza: Firefox envía líneas (≈3 por giro) y los trackpads pueden deslizar en horizontal.
+    const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1;
+    wheelAcc += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * unit;
+    if (Math.abs(wheelAcc) >= 30) {
       const dir = wheelAcc > 0 ? 1 : -1;
       wheelAcc = 0;
       wheelLock = now + 1000; // el trackpad envía muchos eventos por cada gesto

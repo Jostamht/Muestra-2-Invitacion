@@ -109,7 +109,8 @@ body.is-open .veil { opacity: 1; }
 
 .book.is-open { --tilt: 46deg; --roll: 0deg; --drop: 0dvh; }
 
-@media (min-aspect-ratio: 29/20) {
+/* Libro de dos páginas cuando hay ancho para mostrarlas completas (no solo en pantallas muy apaisadas) */
+@media (min-width: 700px) {
   .book { --pw: min(43vw, calc(70vh / 1.36)); --pw: min(43vw, calc(70dvh / 1.36)); }
   .book.is-open { --shift: .5; }
 }
