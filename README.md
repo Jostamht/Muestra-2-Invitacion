@@ -5,7 +5,8 @@ Al abrir el enlace se ve la portada cerrada sobre un escritorio. Con un toque se
 el fondo pasa a un oscuro difuminado y cada página muestra un dato de la boda con piezas de papel
 que se levantan al llegar.
 
-Hecha por JotaPG. Estilo romántico moderno: negro vino, rojo y dorado.
+Hecha por JotaPG. Estilo romántico moderno: negro vino, burdeos y dorado, con papel calado en capas,
+sello de lacre y cinta marcapáginas en la portada.
 
 ## Qué incluye
 
@@ -51,6 +52,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`.
 ```
 index.html        página y controles
 css/styles.css    diseño, libro 3D y pop-ups
+img/              texturas (papel, cuero y madera)
 js/config.js      datos de la invitación
 js/pages.js       diseño de cada página
 js/book.js        apertura, páginas, gestos, música y cuenta regresiva

@@ -4,53 +4,93 @@
   Medidas: 1u = 1% del ancho de la página (la página mide 100u x 136u).
 */
 (function () {
+  const GOLD = "#c9a24b", GOLD_HI = "#e6c677", IVORY = "#efe4cf";
   const HEART = "M50 86C20 62 2 44 2 26 2 12 13 3 26 3c10 0 19 5 24 14C55 8 64 3 74 3c13 0 24 9 24 23 0 18-18 36-48 60z";
+
+  /* Degradados compartidos por todas las ilustraciones (se insertan una sola vez). */
+  const defs = `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+    <linearGradient id="gFold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".34"/></linearGradient>
+    <linearGradient id="gBurg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8c1a2b"/><stop offset="1" stop-color="#4d0b17"/></linearGradient>
+  </defs></svg>`;
+
   const heartSvg = (cls = "") => `<svg class="${cls}" viewBox="0 0 100 90" aria-hidden="true"><path d="${HEART}"/></svg>`;
+
+  /* Corazón de papel con filo dorado y un segundo contorno fino adentro */
+  const heartMedal = (fill = "#7a1a2e") =>
+    `<svg viewBox="0 0 100 90" aria-hidden="true" overflow="visible">
+       <path d="${HEART}" fill="${fill}" stroke="${GOLD}" stroke-width="2.4" stroke-linejoin="round"/>
+       <path d="${HEART}" transform="translate(11 9.8) scale(.78)" fill="none" stroke="${GOLD_HI}" stroke-opacity=".65" stroke-width="1.4"/>
+       <path d="${HEART}" fill="url(#gFold)"/>
+     </svg>`;
+
   const ornament = (cls = "orn") =>
-    `<svg class="${cls}" viewBox="0 0 120 12" aria-hidden="true"><path d="M0 6h50M70 6h50" stroke="#c9a24b" stroke-width="1" fill="none"/><path d="M60 1l5 5-5 5-5-5z" fill="#c9a24b"/><circle cx="46" cy="6" r="1.4" fill="#c9a24b"/><circle cx="74" cy="6" r="1.4" fill="#c9a24b"/></svg>`;
+    `<svg class="${cls}" viewBox="0 0 120 12" aria-hidden="true"><path d="M0 6h50M70 6h50" stroke="${GOLD}" stroke-width=".8" fill="none"/><path d="M60 1.5l4.5 4.5-4.5 4.5-4.5-4.5z" fill="${GOLD}"/><circle cx="47" cy="6" r="1.2" fill="${GOLD}"/><circle cx="73" cy="6" r="1.2" fill="${GOLD}"/></svg>`;
 
   const u = (n) => `calc(var(--u) * ${n})`;
   const box = (l, t, w, h) => `left:${u(l)};top:${u(t)};width:${u(w)};height:${u(h)}`;
 
-  /* Pieza de papel que se levanta. hinge = borde inferior (donde se dobla). */
+  /* Pieza de papel que se levanta. El borde inferior es la bisagra. */
   const pop = ({ l, t, w, h, lift = -64, d = 0, roll = 0, cls = "" }, inner) =>
     `<div class="pop ${cls}" style="${box(l, t, w, h)};--lift:${lift}deg;--d:${d}s;--roll:${roll}deg">` +
     `<div class="sheet">${inner}</div><i class="pshadow"></i></div>`;
 
-  const archSvg = (fill, inner) =>
-    `<svg viewBox="0 0 100 120" preserveAspectRatio="none" aria-hidden="true">
-       <path d="M3 120V50a47 47 0 0 1 94 0v70z" fill="${fill}" stroke="#c9a24b" stroke-width="1.6"/>
-       <path d="M17 120V52a33 33 0 0 1 66 0v68z" fill="${inner}" stroke="#c9a24b" stroke-width="1" stroke-opacity=".7"/>
-       <path d="M50 12l-4 5 4 5 4-5z" fill="#c9a24b"/>
-     </svg>`;
+  /* ---------- Ilustraciones de papel ---------- */
+
+  function archBack() {
+    let dots = "";
+    for (let k = 0; k <= 18; k++) {
+      const a = Math.PI - (k / 18) * Math.PI;
+      dots += `<circle cx="${(76 + 64 * Math.cos(a)).toFixed(1)}" cy="${(52 - 64 * Math.sin(a)).toFixed(1)}" r="1.3" fill="${GOLD_HI}" opacity=".85"/>`;
+    }
+    for (let y = 60; y <= 98; y += 9) dots += `<circle cx="12" cy="${y}" r="1.3" fill="${GOLD_HI}" opacity=".85"/><circle cx="140" cy="${y}" r="1.3" fill="${GOLD_HI}" opacity=".85"/>`;
+    const outer = "M4 104V52a72 72 0 0 1 144 0V104z";
+    return `<svg viewBox="0 0 152 104" preserveAspectRatio="none" aria-hidden="true">
+      <path d="${outer}" fill="url(#gBurg)" stroke="${GOLD}" stroke-width="1.4"/>
+      <path d="M20 104V54a56 56 0 0 1 112 0V104z" fill="#1d0710" stroke="${GOLD}" stroke-opacity=".8" stroke-width="1"/>
+      ${dots}<path d="${outer}" fill="url(#gFold)"/>
+    </svg>`;
+  }
+
+  const archFront = `<svg viewBox="0 0 140 92" preserveAspectRatio="none" aria-hidden="true">
+      <path fill-rule="evenodd" d="M6 92V46a64 64 0 0 1 128 0V92z M13 92V47a57 57 0 0 1 114 0V92z" fill="${IVORY}" stroke="${GOLD}" stroke-width=".8"/>
+      <path fill-rule="evenodd" d="M6 92V46a64 64 0 0 1 128 0V92z M13 92V47a57 57 0 0 1 114 0V92z" fill="url(#gFold)"/>
+    </svg>`;
+
+  /* Rama con hojas, a cada lado del arco */
+  function branch(flip) {
+    let leaves = "";
+    for (let i = 0; i < 6; i++) {
+      const y = 72 - i * 11, s = i % 2 ? 1 : -1;
+      leaves += `<path d="M15 ${y}q${s * 8} -2 ${s * 12} -10q${-s * 9} 1 ${-s * 12} 10z" fill="${i % 2 ? GOLD : "#e9dcc2"}" stroke="#7a5a1a" stroke-width=".4"/>`;
+    }
+    return `<svg viewBox="0 0 30 80" preserveAspectRatio="none" aria-hidden="true">
+      <g ${flip ? 'transform="translate(30 0) scale(-1 1)"' : ""}>
+        <path d="M15 80C13 60 17 40 14 7" stroke="${GOLD}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        ${leaves}<circle cx="14" cy="6" r="2.4" fill="${GOLD_HI}"/>
+      </g>
+    </svg>`;
+  }
 
   const venueSvg = `
     <svg viewBox="0 0 140 92" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M10 36 70 6l60 30z" fill="#a3212f" stroke="#c9a24b" stroke-width="1.6" stroke-linejoin="round"/>
-      <rect x="18" y="36" width="104" height="56" fill="#eadfca"/>
-      <rect x="18" y="36" width="104" height="5" fill="#c9a24b"/>
-      <rect x="18" y="86" width="104" height="6" fill="#d3c3a3"/>
-      <path d="M58 92V68a12 12 0 0 1 24 0v24z" fill="#5b0f1d" stroke="#c9a24b" stroke-width="1"/>
-      <g fill="#5b0f1d" stroke="#c9a24b" stroke-width=".8">
+      <path d="M10 36 70 6l60 30z" fill="#6f1627" stroke="${GOLD}" stroke-width="1.5" stroke-linejoin="round"/>
+      <rect x="18" y="36" width="104" height="56" fill="${IVORY}"/>
+      <rect x="18" y="36" width="104" height="4" fill="${GOLD}"/>
+      <rect x="18" y="87" width="104" height="5" fill="#d3c3a3"/>
+      <path d="M58 92V68a12 12 0 0 1 24 0v24z" fill="#4d0b17" stroke="${GOLD}" stroke-width="1"/>
+      <g fill="#4d0b17" stroke="${GOLD}" stroke-width=".8">
         <path d="M27 78V60a6 6 0 0 1 12 0v18z"/><path d="M43 78V60a6 6 0 0 1 12 0v18z"/>
         <path d="M85 78V60a6 6 0 0 1 12 0v18z"/><path d="M101 78V60a6 6 0 0 1 12 0v18z"/>
       </g>
-      <path d="M70 31c-4.5-3-7-5.5-7-8a3.4 3.4 0 0 1 7-1.2 3.4 3.4 0 0 1 7 1.2c0 2.5-2.5 5-7 8z" fill="#f0d58a"/>
-    </svg>`;
-
-  const pillarSvg = `
-    <svg viewBox="0 0 20 90" preserveAspectRatio="none" aria-hidden="true">
-      <rect x="1" y="0" width="18" height="6" fill="#c9a24b"/>
-      <rect x="3" y="6" width="14" height="78" fill="#8a1727" stroke="#c9a24b" stroke-width=".8"/>
-      <path d="M8 8v74M12 8v74" stroke="#c9a24b" stroke-opacity=".45" stroke-width=".7"/>
-      <rect x="1" y="84" width="18" height="6" fill="#c9a24b"/>
+      <circle cx="70" cy="24" r="5" fill="none" stroke="${GOLD_HI}" stroke-width="1.2"/><circle cx="70" cy="24" r="1.8" fill="${GOLD_HI}"/>
+      <rect x="18" y="36" width="104" height="56" fill="url(#gFold)"/>
     </svg>`;
 
   const treeSvg = `
     <svg viewBox="0 0 40 80" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M20 2c14 14 18 34 18 52 0 8-8 12-18 12S2 62 2 54C2 36 6 16 20 2z" fill="#7c1424" stroke="#c9a24b" stroke-width="1.2"/>
-      <path d="M20 10c8 12 11 28 11 42" stroke="#c9a24b" stroke-opacity=".5" fill="none" stroke-width=".8"/>
-      <rect x="17" y="64" width="6" height="16" fill="#c9a24b"/>
+      <path d="M20 2c14 14 18 34 18 52 0 8-8 12-18 12S2 62 2 54C2 36 6 16 20 2z" fill="#4d0b17" stroke="${GOLD}" stroke-width="1.1"/>
+      <path d="M20 10c8 12 11 28 11 42" stroke="${GOLD}" stroke-opacity=".5" fill="none" stroke-width=".8"/>
+      <rect x="18" y="64" width="4" height="16" fill="${GOLD}"/>
     </svg>`;
 
   const envelopeBody = `
@@ -59,12 +99,13 @@
       <path d="M0 62 50 26l50 36z" fill="#d8c8a8"/>
       <path d="M0 0l50 38L100 0v62H0z" fill="#efe3cc"/>
       <path d="M0 62 50 30l50 32" fill="none" stroke="#b99a58" stroke-width="1"/>
-      <rect x=".5" y=".5" width="99" height="61" fill="none" stroke="#c9a24b" stroke-width="1"/>
+      <rect x=".5" y=".5" width="99" height="61" fill="none" stroke="${GOLD}" stroke-width="1"/>
     </svg>`;
   const envelopeFlap = `
     <svg viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0 0h100L50 32z" fill="#a3212f" stroke="#c9a24b" stroke-width="1"/>
-      <circle cx="50" cy="26" r="6" fill="#c9a24b"/>
+      <path d="M0 0h100L50 32z" fill="#7a1a2e" stroke="${GOLD}" stroke-width="1"/>
+      <circle cx="50" cy="25" r="6.5" fill="#a3212f" stroke="${GOLD_HI}" stroke-width="1"/>
+      <circle cx="50" cy="25" r="3.6" fill="none" stroke="${GOLD_HI}" stroke-opacity=".7" stroke-width=".7"/>
     </svg>`;
 
   function monthGrid(date, tz) {
@@ -84,21 +125,22 @@
 
   const mapSvg = (nombre) => `
     <div class="map"><svg viewBox="0 0 200 150" aria-hidden="true">
-      <rect width="200" height="150" fill="#1d0e15" stroke="#c9a24b" stroke-opacity=".5"/>
+      <rect width="200" height="150" fill="#1d0e15" stroke="${GOLD}" stroke-opacity=".5"/>
       <path d="M-5 112C40 96 70 118 110 100s60-26 100-6" fill="none" stroke="#7c1424" stroke-width="12" stroke-opacity=".55"/>
-      <g stroke="#c9a24b" stroke-opacity=".55" stroke-width="1.4" fill="none" stroke-linecap="round">
+      <g stroke="${GOLD}" stroke-opacity=".55" stroke-width="1.2" fill="none" stroke-linecap="round">
         <path d="M0 40h200M0 74h200M30 0v150M82 0v150M140 0v150"/>
         <path d="M0 140 200 20" stroke-opacity=".35"/>
       </g>
-      <rect x="92" y="10" width="38" height="24" fill="#3a1a22" stroke="#c9a24b" stroke-opacity=".4"/>
+      <rect x="92" y="10" width="38" height="24" fill="#3a1a22" stroke="${GOLD}" stroke-opacity=".4"/>
       <g transform="translate(111 52)">
-        <path d="M0 22C-9 11-12 6-12 0a12 12 0 0 1 24 0c0 6-3 11-12 22z" fill="#a3212f" stroke="#f0d58a" stroke-width="1.4"/>
-        <circle cy="0" r="4.2" fill="#f0d58a"/>
+        <path d="M0 22C-9 11-12 6-12 0a12 12 0 0 1 24 0c0 6-3 11-12 22z" fill="#a3212f" stroke="${GOLD_HI}" stroke-width="1.4"/>
+        <circle cy="0" r="4.2" fill="${GOLD_HI}"/>
       </g>
     </svg></div>
     <p class="p" style="margin-top:${u(5)}">${nombre}</p>`;
 
   const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const medal = (fill) => `<div class="art">${heartMedal(fill)}</div>`;
 
   window.buildPages = function (C) {
     const date = new Date(C.fecha);
@@ -110,7 +152,8 @@
     const year = f({ year: "numeric" });
     const time = f({ hour: "numeric", minute: "2-digit", hour12: true }).replace(/\s/g, " ");
     const A = C.novios.primero, B = C.novios.segundo;
-    const lead = (cls, inner, extra = "") => `<section class="page ${cls}" ${extra}><div class="frame"></div>${inner}</section>`;
+    const lead = (cls, inner) => `<section class="page ${cls}"><div class="frame"></div>${inner}</section>`;
+    const monogram = `<div class="frame"></div><div class="leftpage"><div class="mono foil">${A[0]}&amp;${B[0]}</div></div>`;
 
     /* ---- Portada ---- */
     const cover = `
@@ -121,11 +164,9 @@
         <span class="cover-and">${heartSvg()}</span>
         <span class="cover-name foil">${B}</span>
         <span class="cover-date foil">${dayNum} de ${month} de ${year}</span>
+        <div class="seal" aria-hidden="true"><i>${heartSvg()}</i><i>${heartSvg()}</i></div>
       </div>`;
 
-    const coverBack = `<div class="frame"></div><div class="leftpage"><div class="mono foil">${A[0]}&amp;${B[0]}</div></div>`;
-
-    /* ---- Páginas ---- */
     const leaves = [];
 
     // 1. Bienvenida (su página izquierda es el interior de la portada)
@@ -133,10 +174,11 @@
       label: "Bienvenida",
       front: lead("pg-welcome", `
         <div class="stage3d">
-          ${pop({ l: 12, t: 12, w: 76, h: 52, lift: -58, d: 0 }, archSvg("#8a1727", "#2a0a12"))}
-          ${pop({ l: 5, t: 30, w: 8, h: 36, lift: -66, d: .16 }, pillarSvg)}
-          ${pop({ l: 87, t: 30, w: 8, h: 36, lift: -66, d: .22 }, pillarSvg)}
-          ${pop({ l: 38, t: 46, w: 24, h: 22, lift: -48, d: .4 }, `<div class="art heartfill" style="color:#f0d58a">${heartSvg()}</div>`)}
+          ${pop({ l: 12, t: 10, w: 76, h: 54, lift: -58, d: 0 }, archBack())}
+          ${pop({ l: 15, t: 20, w: 70, h: 46, lift: -64, d: .14 }, archFront)}
+          ${pop({ l: 2, t: 32, w: 12, h: 34, lift: -70, d: .26, roll: -3 }, branch(false))}
+          ${pop({ l: 86, t: 32, w: 12, h: 34, lift: -70, d: .32, roll: 3 }, branch(true))}
+          ${pop({ l: 39, t: 48, w: 22, h: 20, lift: -46, d: .44 }, medal("#7a1a2e"))}
         </div>
         <div class="copy">
           <h2 class="h">Nos casamos</h2>
@@ -151,10 +193,10 @@
       label: "Fecha",
       front: lead("pg-date", `
         <div class="stage3d">
-          ${pop({ l: 17, t: 14, w: 66, h: 50, lift: -60, d: 0 }, `<div class="paper red" style="height:100%"></div>`)}
-          ${pop({ l: 22, t: 20, w: 56, h: 46, lift: -66, d: .2, roll: 0 }, `<div class="paper ivory cal-card"><div class="mes">${month}</div><div class="dia">${dayNum}</div><div class="sem">${weekday}</div></div>`)}
-          ${pop({ l: 6, t: 40, w: 14, h: 13, lift: -52, d: .45, roll: -14 }, `<div class="art heartfill" style="color:#c9a24b">${heartSvg()}</div>`)}
-          ${pop({ l: 80, t: 38, w: 14, h: 13, lift: -52, d: .55, roll: 14 }, `<div class="art heartfill" style="color:#a3212f">${heartSvg()}</div>`)}
+          ${pop({ l: 17, t: 12, w: 66, h: 52, lift: -58, d: 0 }, `<div class="paper red scallop"></div>`)}
+          ${pop({ l: 22, t: 20, w: 56, h: 46, lift: -66, d: .2 }, `<div class="paper ivory framed cal-card"><div class="mes">${month}</div><div class="dia">${dayNum}</div><div class="sem">${weekday}</div></div>`)}
+          ${pop({ l: 5, t: 42, w: 14, h: 12, lift: -52, d: .45, roll: -12 }, medal("#4d0b17"))}
+          ${pop({ l: 81, t: 40, w: 14, h: 12, lift: -52, d: .55, roll: 12 }, medal("#7a1a2e"))}
         </div>
         <div class="copy" style="top:${u(75)}">
           <h2 class="h sm">${weekday} ${dayNum} de ${month}</h2>
@@ -174,9 +216,9 @@
       label: "Lugar",
       front: lead("pg-place", `
         <div class="stage3d">
-          ${pop({ l: 8, t: 20, w: 12, h: 26, lift: -72, d: .3, roll: -3 }, treeSvg)}
-          ${pop({ l: 80, t: 20, w: 12, h: 26, lift: -72, d: .36, roll: 3 }, treeSvg)}
-          ${pop({ l: 15, t: 14, w: 70, h: 50, lift: -56, d: 0 }, venueSvg)}
+          ${pop({ l: 7, t: 18, w: 12, h: 30, lift: -72, d: .3, roll: -3 }, treeSvg)}
+          ${pop({ l: 81, t: 18, w: 12, h: 30, lift: -72, d: .36, roll: 3 }, treeSvg)}
+          ${pop({ l: 15, t: 12, w: 70, h: 52, lift: -58, d: 0 }, venueSvg)}
         </div>
         <div class="copy" style="top:${u(77)}">
           <h2 class="h sm">${C.lugar.nombre}</h2>
@@ -192,8 +234,8 @@
       label: "Itinerario",
       front: lead("pg-agenda", `
         <div class="stage3d">
-          ${pop({ l: 8, t: 8, w: 84, h: 58, lift: -52, d: 0 }, `<div class="paper red" style="height:100%;clip-path:polygon(0 12%,6% 6%,12% 12%,18% 6%,24% 12%,30% 6%,36% 12%,42% 6%,48% 12%,54% 6%,60% 12%,66% 6%,72% 12%,78% 6%,84% 12%,90% 6%,96% 12%,100% 8%,100% 100%,0 100%)"></div>`)}
-          ${pop({ l: 14, t: 20, w: 72, h: 46, lift: -62, d: .22 }, `<ul class="paper ivory agenda" style="padding-left:${u(5)};margin:0">${rows}</ul>`)}
+          ${pop({ l: 8, t: 6, w: 84, h: 60, lift: -54, d: 0 }, `<div class="paper red scallop"></div>`)}
+          ${pop({ l: 14, t: 18, w: 72, h: 48, lift: -62, d: .22 }, `<ul class="paper ivory framed agenda">${rows}</ul>`)}
         </div>
         <div class="copy">
           <h2 class="h sm">Así será el día</h2>
@@ -206,9 +248,9 @@
     // 5. Vestimenta
     const sw = C.vestimenta.colores;
     const fan = [
-      { l: 12, roll: -16, d: .05, cls: "red" }, { l: 38, roll: 0, d: .2, cls: "gold" }, { l: 64, roll: 16, d: .35, cls: "black" }
-    ].map((p, i) => pop({ l: p.l, t: 22, w: 24, h: 40, lift: -62, d: p.d, roll: p.roll },
-      `<div class="paper ${p.cls} swatch" style="height:100%"><i>${heartSvg()}</i>${sw[i].nombre}</div>`)).join("");
+      { l: 12, roll: -15, d: .05 }, { l: 38, roll: 0, d: .2 }, { l: 64, roll: 15, d: .35 }
+    ].map((p, i) => pop({ l: p.l, t: 20, w: 24, h: 44, lift: -62, d: p.d, roll: p.roll },
+      `<div class="paper framed swatch" style="height:100%;background:${sw[i].hex};color:${sw[i].texto}"><i>${heartSvg()}</i>${sw[i].nombre}</div>`)).join("");
     leaves.push({
       label: "Vestimenta",
       front: lead("pg-dress", `
@@ -226,9 +268,9 @@
       label: "Regalos",
       front: lead("pg-gifts", `
         <div class="stage3d">
-          ${pop({ l: 16, t: 24, w: 68, h: 42, lift: -60, d: 0 }, `
+          ${pop({ l: 16, t: 22, w: 68, h: 44, lift: -60, d: 0 }, `
             <div class="env-wrap">
-              <div class="env-card paper ivory"><b>${C.regalos.titulo}</b>${heartSvg()}</div>
+              <div class="env-card paper ivory framed"><b>${C.regalos.titulo}</b><div class="mini">${heartMedal("#7a1a2e")}</div></div>
               <div class="env-body">${envelopeBody}</div>
               <div class="env-flap">${envelopeFlap}</div>
             </div>`)}
@@ -245,7 +287,7 @@
       label: "Confirmación",
       front: lead("pg-rsvp", `
         <div class="stage3d">
-          ${pop({ l: 20, t: 12, w: 60, h: 52, lift: -58, d: 0 }, `<div class="paper ivory" style="height:100%;display:grid;place-items:center;text-align:center;padding:${u(4)}"><div><div class="art heartfill" style="width:${u(14)};height:${u(12)};margin:0 auto ${u(3)};color:#a3212f">${heartSvg()}</div><b style="font-family:var(--serif);font-style:italic;font-weight:500;font-size:${u(8.2)};line-height:1.05">¿Nos acompañas?</b></div></div>`)}
+          ${pop({ l: 20, t: 10, w: 60, h: 54, lift: -58, d: 0 }, `<div class="paper ivory framed rsvp-card"><div class="mini">${heartMedal("#7a1a2e")}</div><b>¿Nos acompañas?</b></div>`)}
         </div>
         <div class="copy" style="top:${u(76)}">
           <p class="p">${C.confirmacion.texto}</p>
@@ -262,19 +304,19 @@
       label: "Gracias",
       front: lead("pg-end", `
         <div class="stage3d">
-          ${pop({ l: 30, t: 14, w: 40, h: 36, lift: -56, d: 0 }, `<div class="art heartfill" style="color:#a3212f">${heartSvg()}</div>`)}
-          ${pop({ l: 14, t: 38, w: 17, h: 15, lift: -50, d: .3, roll: -12 }, `<div class="art heartfill" style="color:#c9a24b">${heartSvg()}</div>`)}
-          ${pop({ l: 69, t: 34, w: 19, h: 17, lift: -50, d: .4, roll: 10 }, `<div class="art heartfill" style="color:#c9a24b">${heartSvg()}</div>`)}
+          ${pop({ l: 29, t: 12, w: 42, h: 38, lift: -56, d: 0 }, medal("#6f1627"))}
+          ${pop({ l: 13, t: 38, w: 17, h: 15, lift: -50, d: .3, roll: -12 }, medal("#4d0b17"))}
+          ${pop({ l: 70, t: 34, w: 19, h: 17, lift: -50, d: .4, roll: 10 }, medal("#4d0b17"))}
         </div>
         <div class="copy" style="top:${u(70)}">
-          <h2 class="h"><span class="foil">${A} y ${B}</span></h2>
+          <h2 class="h">${A} y ${B}</h2>
           ${ornament()}
           <p class="p">Gracias por ser parte de este día.</p>
           <button class="btn ghost" type="button" data-action="restart">Volver a la portada</button>
         </div>`),
-      back: `<div class="frame"></div><div class="leftpage"><div class="mono foil">${A[0]}&amp;${B[0]}</div></div>`
+      back: monogram
     });
 
-    return { cover, coverBack, leaves, parts: { weekday, dayNum, month, year, time } };
+    return { defs, cover, coverBack: monogram, leaves };
   };
 })();

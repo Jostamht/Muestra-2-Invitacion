@@ -19,7 +19,8 @@
   /* ---------- Construcción del libro ---------- */
 
   const blank = `<div class="frame"></div>`;
-  let html = `<div class="board-l"></div><div class="board"></div><div class="block"></div>`;
+  document.body.insertAdjacentHTML("afterbegin", P.defs);
+  let html = `<div class="board-l"></div><div class="board"></div><div class="ribbon"></div><div class="block"></div>`;
   html += `<div class="leaf cover" style="--i:0">
       <div class="face front cover-front" role="button" tabindex="0" aria-label="Abrir la invitación">${P.cover}</div>
       <div class="face back">${P.coverBack}</div>
@@ -67,13 +68,22 @@
     const from = s;
 
     // 1. El papel se aplana antes de pasar la hoja
-    leaves.forEach((lf) => lf.classList.remove("is-current"));
+    leaves.forEach((lf) => {
+      if (lf.classList.contains("is-current")) {
+        lf.classList.add("folding");
+        setTimeout(() => lf.classList.remove("folding"), 480);
+      }
+      lf.classList.remove("is-current");
+    });
     if (from >= 1) await wait(300);
 
     // 2. Se pasa la hoja (o varias, si se vuelve a la portada)
     if (restart) {
       leaves.forEach((lf, i) => lf.style.setProperty("--delay", `${Math.max(0, from - 1 - i) * 0.1}s`));
     }
+    const turning = restart ? leaves.slice(0, from) : [leaves[Math.min(from, to)]];
+    turning.forEach((lf) => lf.classList.add("turning"));
+    setTimeout(() => turning.forEach((lf) => lf.classList.remove("turning")), reduce ? 0 : 1400 + (restart ? from * 100 : 0));
     s = to;
     document.body.classList.toggle("is-open", s >= 1);
     book.classList.toggle("is-open", s >= 1);
@@ -142,6 +152,21 @@
 
   prevBtn.addEventListener("click", prev);
   nextBtn.addEventListener("click", next);
+
+  /* ---------- Profundidad: la vista se desplaza apenas con el mouse ---------- */
+
+  if (!reduce && matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    let raf = 0;
+    document.addEventListener("pointermove", (e) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const x = e.clientX / innerWidth - 0.5, y = e.clientY / innerHeight - 0.5;
+        scene.style.setProperty("--ox", `${(x * -14).toFixed(1)}%`);
+        scene.style.setProperty("--oy", `${(y * -8).toFixed(1)}%`);
+      });
+    });
+  }
 
   /* ---------- Música ---------- */
 
