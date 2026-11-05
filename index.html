@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Marido y Mujer, invitación de boda</title>
+  <meta name="description" content="Estás invitado a nuestra boda. Abre el libro para ver todos los detalles.">
+  <meta name="theme-color" content="#0f0709">
+  <meta name="robots" content="noindex">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="desk" id="desk" aria-hidden="true"></div>
+  <div class="veil" id="veil" aria-hidden="true"></div>
+
+  <main class="scene" id="scene">
+    <div class="book" id="book"></div>
+  </main>
+
+  <p class="hint" id="hint">Toca el libro para abrirlo</p>
+
+  <nav class="nav" id="nav" aria-label="Páginas de la invitación">
+    <button class="nav-btn" id="prev" type="button" aria-label="Página anterior">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <ol class="dots" id="dots"></ol>
+    <button class="nav-btn" id="next" type="button" aria-label="Página siguiente">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </nav>
+
+  <button class="music" id="music" type="button" aria-pressed="true" aria-label="Silenciar la música">
+    <svg class="ic-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>
+    <svg class="ic-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+  </button>
+
+  <p class="sr" id="live" aria-live="polite"></p>
+
+  <noscript><p class="sr">Esta invitación necesita JavaScript para abrirse.</p></noscript>
+
+  <script src="js/config.js"></script>
+  <script src="js/pages.js"></script>
+  <script src="js/book.js"></script>
+</body>
+</html>
