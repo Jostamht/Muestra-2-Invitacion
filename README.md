@@ -20,8 +20,8 @@ sello de lacre y cinta marcapáginas en la portada.
 8. Confirmación de asistencia (espacio reservado)
 9. Cierre, con botón para volver a la portada
 
-Además tiene música de fondo con botón para silenciarla, navegación deslizando, con flechas
-en pantalla o con el teclado, y funciona en celular y en computadora. En pantallas anchas el libro
+Además tiene música de fondo con botón para silenciarla, navegación con scroll (rueda del mouse o deslizando hacia arriba y abajo), deslizando hacia los lados,
+con flechas en pantalla o con el teclado, y funciona en celular y en computadora. En pantallas anchas el libro
 se muestra como dos páginas abiertas.
 
 ## Cómo cambiar los datos

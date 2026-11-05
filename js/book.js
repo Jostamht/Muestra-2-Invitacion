@@ -126,6 +126,9 @@
     const dx = e.clientX - down.x, dy = e.clientY - down.y, d = down;
     down = null;
     if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.4) return dx < 0 ? next() : prev();
+    // Deslizar hacia arriba avanza y hacia abajo retrocede, como un scroll. Con el libro cerrado no hace nada:
+    // abrirlo requiere un toque (el navegador solo deja sonar la música tras un toque).
+    if (Math.abs(dy) > 45 && Math.abs(dy) > Math.abs(dx) * 1.4) return scrollStep(dy < 0 ? 1 : -1);
     if (Math.hypot(dx, dy) > 10) return;
 
     const t = d.target;
@@ -149,6 +152,30 @@
     else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); prev(); }
     else if ((e.key === "Enter" || e.key === " ") && s === 0 && e.target.closest(".cover-front")) { e.preventDefault(); open(); }
   });
+
+  /* ---------- Scroll: una página por gesto ---------- */
+
+  function scrollStep(dir) {
+    if (s === 0) return;
+    if (dir > 0) next();
+    else if (s > 1) prev(); // con scroll no se cierra el libro por accidente
+  }
+
+  let wheelAcc = 0, wheelAt = 0, wheelLock = 0;
+  document.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const now = performance.now();
+    if (s === 0 || now < wheelLock) return;
+    if (now - wheelAt > 250) wheelAcc = 0;
+    wheelAt = now;
+    wheelAcc += e.deltaY;
+    if (Math.abs(wheelAcc) >= 40) {
+      const dir = wheelAcc > 0 ? 1 : -1;
+      wheelAcc = 0;
+      wheelLock = now + 1000; // el trackpad envía muchos eventos por cada gesto
+      scrollStep(dir);
+    }
+  }, { passive: false });
 
   prevBtn.addEventListener("click", prev);
   nextBtn.addEventListener("click", next);

@@ -40,20 +40,20 @@
     let dots = "";
     for (let k = 0; k <= 18; k++) {
       const a = Math.PI - (k / 18) * Math.PI;
-      dots += `<circle cx="${(76 + 64 * Math.cos(a)).toFixed(1)}" cy="${(52 - 64 * Math.sin(a)).toFixed(1)}" r="1.3" fill="${GOLD_HI}" opacity=".85"/>`;
+      dots += `<circle cx="${(76 + 64 * Math.cos(a)).toFixed(1)}" cy="${(72 - 64 * Math.sin(a)).toFixed(1)}" r="1.3" fill="${GOLD_HI}" opacity=".85"/>`;
     }
-    for (let y = 60; y <= 98; y += 9) dots += `<circle cx="12" cy="${y}" r="1.3" fill="${GOLD_HI}" opacity=".85"/><circle cx="140" cy="${y}" r="1.3" fill="${GOLD_HI}" opacity=".85"/>`;
-    const outer = "M4 104V52a72 72 0 0 1 144 0V104z";
+    for (let y = 80; y <= 98; y += 9) dots += `<circle cx="12" cy="${y}" r="1.3" fill="${GOLD_HI}" opacity=".85"/><circle cx="140" cy="${y}" r="1.3" fill="${GOLD_HI}" opacity=".85"/>`;
+    const outer = "M4 104V72a72 72 0 0 1 144 0V104z";
     return `<svg viewBox="0 0 152 104" preserveAspectRatio="none" aria-hidden="true">
       <path d="${outer}" fill="url(#gBurg)" stroke="${GOLD}" stroke-width="1.4"/>
-      <path d="M20 104V54a56 56 0 0 1 112 0V104z" fill="#1d0710" stroke="${GOLD}" stroke-opacity=".8" stroke-width="1"/>
+      <path d="M20 104V72a56 56 0 0 1 112 0V104z" fill="#1d0710" stroke="${GOLD}" stroke-opacity=".8" stroke-width="1"/>
       ${dots}<path d="${outer}" fill="url(#gFold)"/>
     </svg>`;
   }
 
   const archFront = `<svg viewBox="0 0 140 92" preserveAspectRatio="none" aria-hidden="true">
-      <path fill-rule="evenodd" d="M6 92V46a64 64 0 0 1 128 0V92z M13 92V47a57 57 0 0 1 114 0V92z" fill="${IVORY}" stroke="${GOLD}" stroke-width=".8"/>
-      <path fill-rule="evenodd" d="M6 92V46a64 64 0 0 1 128 0V92z M13 92V47a57 57 0 0 1 114 0V92z" fill="url(#gFold)"/>
+      <path fill-rule="evenodd" d="M6 92V64a64 64 0 0 1 128 0V92z M13 92V64a57 57 0 0 1 114 0V92z" fill="${IVORY}" stroke="${GOLD}" stroke-width=".8"/>
+      <path fill-rule="evenodd" d="M6 92V64a64 64 0 0 1 128 0V92z M13 92V64a57 57 0 0 1 114 0V92z" fill="url(#gFold)"/>
     </svg>`;
 
   /* Rama con hojas, a cada lado del arco */
